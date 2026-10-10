@@ -30,6 +30,10 @@ jobs:
           mkdir _site
           cp -r index.html css js fonts _site/
           touch _site/.nojekyll
+          # Stamp CSS/JS links with the commit so browsers fetch fresh files after each update
+          V="${GITHUB_SHA::7}"
+          sed -i -E "s#(href|src)=\"((css|js)/[^\"?]+)\"#\1=\"\2?v=${V}\"#g" _site/index.html
+          grep -E '(css|js)/[^"]+\?v=' _site/index.html
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
