@@ -102,7 +102,11 @@
       scrollTarget = target;
       paper.scrollTo({ top: target, behavior: smooth ? "smooth" : "auto" });
       clearTimeout(scrollTimer);
-      scrollTimer = setTimeout(() => { scrollTarget = null; }, smooth ? 700 : 0);
+      scrollTimer = setTimeout(() => {
+        // If the smooth scroll didn't land (some browsers pause it), jump there directly.
+        if (Math.abs(paper.scrollTop - target) > 2) paper.scrollTop = target;
+        scrollTarget = null;
+      }, smooth ? 700 : 0);
     }
 
     function reveal(i, instant) {
