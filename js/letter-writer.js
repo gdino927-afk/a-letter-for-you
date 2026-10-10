@@ -69,15 +69,22 @@
     pen.className = "pen";
     pen.setAttribute("aria-hidden", "true");
     pen.innerHTML = `<svg viewBox="0 0 24 120" width="18" height="90"><path d="M12 118 L8 92 L8 14 Q12 4 16 14 L16 92 Z" fill="var(--pen-body)"/><path d="M12 118 L9.4 100 L14.6 100 Z" fill="var(--pen-nib)"/><rect x="8" y="30" width="8" height="5" fill="var(--pen-band)"/></svg>`;
-    paper.appendChild(pen);
+    // The pen lives OUTSIDE the scrolling paper (in its parent), so its position
+    // can never stretch the paper's scrollable area.
+    (paper.parentElement || paper).appendChild(pen);
 
     let index = 0, timer = null, speed = 1, state = "idle"; // idle | writing | done
+    let scrollTarget = null, scrollTimer = null;           // where an in-flight smooth scroll will land
+
+    function currentScroll() { return scrollTarget == null ? paper.scrollTop : scrollTarget; }
 
     function placePen(wordEl) {
       if (Settings.reducedMotion()) { pen.classList.remove("is-visible"); return; }
       const pr = paper.getBoundingClientRect(), wr = wordEl.getBoundingClientRect();
-      const x = wr.right - pr.left + paper.scrollLeft;
-      const y = wr.bottom - pr.top + paper.scrollTop;
+      // word position inside the paper's content, then shifted by where the paper will be scrolled
+      const x = paper.offsetLeft + (wr.right - pr.left);
+      const y = paper.offsetTop + (wr.bottom - pr.top + paper.scrollTop) - currentScroll();
+      if (y < 0 || y > paper.offsetTop + paper.clientHeight) { pen.classList.remove("is-visible"); return; }
       pen.style.transform = `translate(${x - 2}px, ${y - 90}px) rotate(18deg)`;
       pen.classList.add("is-visible");
     }
@@ -85,9 +92,17 @@
     function keepInView(wordEl) {
       const pr = paper.getBoundingClientRect(), wr = wordEl.getBoundingClientRect();
       const margin = 48;
-      if (wr.bottom > pr.bottom - margin) {
-        paper.scrollBy({ top: wr.bottom - pr.bottom + margin * 2, behavior: Settings.reducedMotion() ? "auto" : "smooth" });
-      }
+      const wordBottom = wr.bottom - pr.top + paper.scrollTop;          // in content coordinates
+      const visibleBottom = currentScroll() + paper.clientHeight - margin;
+      if (wordBottom <= visibleBottom) return;
+      const maxScroll = Math.max(0, paper.scrollHeight - paper.clientHeight);
+      const target = Math.min(maxScroll, Math.round(wordBottom - paper.clientHeight + margin * 2));
+      if (target <= currentScroll()) return;
+      const smooth = !Settings.reducedMotion();
+      scrollTarget = target;
+      paper.scrollTo({ top: target, behavior: smooth ? "smooth" : "auto" });
+      clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(() => { scrollTarget = null; }, smooth ? 700 : 0);
     }
 
     function reveal(i, instant) {
@@ -120,6 +135,7 @@
       }
       index = words.length;
       state = "done";
+      if (words.length) keepInView(words[words.length - 1].el);   // bring the sign-off into view
       pen.classList.remove("is-visible");
       paper.classList.add("is-complete");
       if (opts.onWord) opts.onWord(index, words.length);

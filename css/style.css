@@ -399,7 +399,7 @@ button { font: inherit; color: inherit; }
 }
 
 .pen {
-  position: absolute; left: 0; top: 0; width: 18px; height: 90px;
+  position: absolute; left: 0; top: 0; z-index: 2; width: 18px; height: 90px;
   pointer-events: none; opacity: 0;
   transform-origin: 9px 90px;
   transition: transform .22s var(--ease), opacity .4s;
