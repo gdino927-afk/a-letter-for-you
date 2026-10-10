@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#2a1d17">
+  <title>A Letter for You</title>
+  <link rel="stylesheet" href="css/fonts.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="app" data-screen="menu">
+
+    <!-- ============ TITLE SCREEN ============ -->
+    <main id="menu" class="menu">
+      <div class="menu__bg" aria-hidden="true">
+        <div class="menu__light"></div>
+        <div class="menu__vignette"></div>
+        <div id="motes" class="motes"></div>
+      </div>
+
+      <div class="menu__inner">
+        <svg class="menu__emblem" viewBox="0 0 120 80" aria-hidden="true">
+          <rect x="6" y="10" width="108" height="64" rx="3" fill="none" stroke="currentColor" stroke-width="1.4"/>
+          <path d="M6 13 L60 50 L114 13" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+          <circle cx="60" cy="50" r="9" fill="var(--rose)" opacity=".9"/>
+          <path d="M60 46.6c-1.5-2.3-5.2-1.6-5.2 1.2 0 2.6 3.4 4.4 5.2 5.9 1.8-1.5 5.2-3.3 5.2-5.9 0-2.8-3.7-3.5-5.2-1.2z" fill="var(--cream)" opacity=".95"/>
+        </svg>
+        <h1 id="title" class="menu__title">A Letter for You</h1>
+        <p id="subtitle" class="menu__subtitle"></p>
+
+        <nav class="menu__actions" aria-label="Main menu">
+          <button id="btn-continue" class="btn btn--primary" type="button" hidden>Continue</button>
+          <button id="btn-start" class="btn btn--primary btn--large" type="button">Start Game</button>
+          <div class="menu__row">
+            <button id="btn-settings" class="btn btn--ghost" type="button">Settings</button>
+            <button id="btn-credits" class="btn btn--ghost" type="button">Credits</button>
+          </div>
+        </nav>
+      </div>
+    </main>
+
+    <!-- ============ GAME ============ -->
+    <div id="game" class="game" hidden>
+      <button id="btn-pause" class="pause-btn" type="button" aria-label="Open game menu">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <span>Menu</span>
+      </button>
+      <div id="scene-root" class="scene-root"></div>
+    </div>
+
+    <div id="veil" class="veil" aria-hidden="true"></div>
+  </div>
+
+  <!-- ============ DIALOGS ============ -->
+  <dialog id="dlg-settings" class="panel" aria-labelledby="settings-title">
+    <form id="settings-form" class="panel__inner">
+      <h2 id="settings-title" class="panel__title">Settings</h2>
+
+      <label class="setting setting--toggle">
+        <span class="setting__label">Sound effects<small>Soft clicks, a chime, the scratch of a pen</small></span>
+        <input type="checkbox" name="sound" class="switch">
+      </label>
+
+      <fieldset class="setting">
+        <legend class="setting__label">Text speed</legend>
+        <div class="segmented">
+          <label><input type="radio" name="textSpeed" value="slow"><span>Slow</span></label>
+          <label><input type="radio" name="textSpeed" value="normal"><span>Normal</span></label>
+          <label><input type="radio" name="textSpeed" value="fast"><span>Fast</span></label>
+        </div>
+      </fieldset>
+
+      <fieldset class="setting">
+        <legend class="setting__label">Motion</legend>
+        <div class="segmented">
+          <label><input type="radio" name="motion" value="system"><span>Device</span></label>
+          <label><input type="radio" name="motion" value="reduced"><span>Reduced</span></label>
+          <label><input type="radio" name="motion" value="full"><span>Full</span></label>
+        </div>
+      </fieldset>
+
+      <div class="panel__actions">
+        <button type="button" class="btn btn--primary" data-close>Done</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="dlg-confirm" class="panel" aria-labelledby="confirm-text">
+    <div class="panel__inner">
+      <p id="confirm-text" class="panel__text"></p>
+      <div class="panel__actions">
+        <button type="button" class="btn btn--ghost" data-close>Cancel</button>
+        <button type="button" id="confirm-yes" class="btn btn--primary">Start over</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="dlg-credits" class="panel" aria-labelledby="credits-title">
+    <div class="panel__inner">
+      <h2 id="credits-title" class="panel__title">Credits</h2>
+      <ul id="credits-list" class="credits"></ul>
+      <div class="panel__actions">
+        <button type="button" class="btn btn--primary" data-close>Close</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="dlg-pause" class="panel" aria-labelledby="pause-title">
+    <div class="panel__inner">
+      <h2 id="pause-title" class="panel__title">Paused</h2>
+      <div class="panel__stack">
+        <button type="button" class="btn btn--primary" data-close>Resume</button>
+        <button type="button" id="pause-settings" class="btn">Settings</button>
+        <button type="button" id="pause-restart" class="btn">Start over</button>
+        <button type="button" id="pause-menu" class="btn btn--ghost">Save &amp; return to title</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Story content first, then systems, then the shell. Order matters. -->
+  <script src="js/content.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/dialogue.js"></script>
+  <script src="js/letter-writer.js"></script>
+  <script src="js/scenes.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
